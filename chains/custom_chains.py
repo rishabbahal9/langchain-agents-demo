@@ -2,7 +2,7 @@ from langchain_core.runnables import RunnableSequence
 from langchain_openai import ChatOpenAI
 from langchain.prompts.prompt import PromptTemplate
 
-from output_parsers import recipes_name_data_parser
+from output_parsers import recipes_name_data_parser, recipes_instructions_data_parser
 
 
 class CustomChains:
@@ -28,3 +28,22 @@ class CustomChains:
         )
 
         return summary_prompt_template | self.llm | recipes_name_data_parser
+
+    def get_dish_instructions(self) -> RunnableSequence:
+        summary_template = """
+                 given the ingredients and instructions of a recipe {recipe_instructions}
+                 I want you to reformat it in the following way
+                 1. a list of ingredients
+                 2. a list of instructions
+                 \n{format_instructions}
+             """
+
+        summary_prompt_template = PromptTemplate(
+            input_variables=["recipe_instructions"],
+            template=summary_template,
+            partial_variables={
+                "format_instructions": recipes_instructions_data_parser.get_format_instructions()
+            },
+        )
+
+        return summary_prompt_template | self.llm | recipes_instructions_data_parser

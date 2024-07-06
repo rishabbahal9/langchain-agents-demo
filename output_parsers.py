@@ -23,5 +23,23 @@ class RecipesNameData(BaseModel):
         }
 
 
+class RecipesInstructionsData(BaseModel):
+    ingredients_list: List[str] = Field(
+        description="list of ingredients for the recipe/dish"
+    )
+    instructions_list: List[str] = Field(
+        description="list of instructions for the recipe/dish"
+    )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "ingredients": self.ingredients_list,
+            "instructions": self.instructions_list,
+        }
+
+
 recipe_name_data_parser = PydanticOutputParser(pydantic_object=RecipeNameData)
 recipes_name_data_parser = PydanticOutputParser(pydantic_object=RecipesNameData)
+recipes_instructions_data_parser = PydanticOutputParser(
+    pydantic_object=RecipesInstructionsData
+)

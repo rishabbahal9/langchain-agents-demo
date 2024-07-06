@@ -1,9 +1,10 @@
 from langchain.prompts.prompt import Prompt, PromptTemplate
 from langchain_openai import ChatOpenAI
 from agents.recipe_lookup_agent import lookup as recipe_lookup_agent
+from agents.recipe_preparation_agent import lookup as recipe_preparation_agent
 from chains.custom_chains import CustomChains
 
-from output_parsers import RecipesNameData
+from output_parsers import RecipesNameData, RecipesInstructionsData
 
 
 class Cooking:
@@ -35,7 +36,7 @@ class Cooking:
         ingredients = input("Enter ingredients: ")
         ethnicity = input("Enter ethnicity/cuisine: ")
 
-        # Gives a list of names of 5 recipes/dishes
+        # Gives a list of names of 3 recipes/dishes
         recipe_response = recipe_lookup_agent(ingredients, ethnicity, self.model)
 
         dishes_chain = CustomChains(self.model).get_dish_chain()
@@ -43,7 +44,29 @@ class Cooking:
             input={"recipe_list_data": recipe_response}
         )
 
-        return parsed_response
+        final_data = []
+        # Finding instructions to prepare dishes
+        for recipe in parsed_response.list:
+            recipe_instructions_response = recipe_preparation_agent(
+                recipe.name, self.model
+            )
+
+            dishe_instruction_chain = CustomChains(self.model).get_dish_instructions()
+            parsed_instruction_response: RecipesInstructionsData = (
+                dishe_instruction_chain.invoke(
+                    input={"recipe_instructions": recipe_instructions_response}
+                )
+            )
+
+            final_data.append(
+                {
+                    "name": recipe.name,
+                    "description": recipe.description,
+                    "ingredients": parsed_instruction_response.ingredients_list,
+                    "instructions": parsed_instruction_response.instructions_list,
+                }
+            )
+        return final_data
 
 
 if __name__ == "__main__":
@@ -59,8 +82,4 @@ if __name__ == "__main__":
 
     # Calling recipe generator agent
     response = ice_breaker.recipe_generator_agent()
-    # print(response.list)
-    for recipe in response.list:
-        print(recipe.name)
-        print(recipe.description)
-        print("-------------------")
+    print(response)
