@@ -3,9 +3,7 @@ from langchain_openai import ChatOpenAI
 from agents.recipe_lookup_agent import lookup as recipe_lookup_agent
 from chains.custom_chains import CustomChains
 
-# import os
-
-from output_parsers import RecipeNameData, RecipesNameData
+from output_parsers import RecipesNameData
 
 
 class Cooking:
@@ -61,4 +59,8 @@ if __name__ == "__main__":
 
     # Calling recipe generator agent
     response = ice_breaker.recipe_generator_agent()
-    print(response)
+    # print(response.list)
+    for recipe in response.list:
+        print(recipe.name)
+        print(recipe.description)
+        print("-------------------")
