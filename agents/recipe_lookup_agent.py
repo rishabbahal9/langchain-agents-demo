@@ -4,7 +4,7 @@ from langchain_core.tools import Tool
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain import hub
 
-from output_parsers import recipe_name_data_parser
+from output_parsers import recipes_name_data_parser
 from tools.tool import crawls_google
 
 
@@ -12,7 +12,8 @@ def lookup(ingredients: str, ethnicity: str, llm_model: str = "gpt-3.5-turbo") -
     llm = ChatOpenAI(temperature=0, model_name=llm_model)
     prompt_template = PromptTemplate(
         template="""
-        Give me a name and 1 line description of the 1 dish that I can make using following {ingredients}. 
+        Create a list of 3 recipes which has name of the dish and 1 line description of the dish that I can make using 
+        following {ingredients}. 
         Person who wants to eat it is of {ethnicity} origin.
         
         Assume, these are the only ingredients available. You don't need to use all the ingredients.
@@ -23,7 +24,7 @@ def lookup(ingredients: str, ethnicity: str, llm_model: str = "gpt-3.5-turbo") -
         Tool(
             name="Crawl google for recipe",
             func=crawls_google,
-            description="Useful when you need to find name of the recipe/dishes",
+            description="Useful when you need to find name or names of the recipe/dishes",
         )
     ]
     react_prompt = hub.pull("hwchase17/react")
@@ -38,7 +39,7 @@ def lookup(ingredients: str, ethnicity: str, llm_model: str = "gpt-3.5-turbo") -
         }
     )
 
-    return result["output"] | recipe_name_data_parser
+    return result["output"]
 
 
 if __name__ == "__main__":

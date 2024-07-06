@@ -1,10 +1,11 @@
 from langchain.prompts.prompt import Prompt, PromptTemplate
 from langchain_openai import ChatOpenAI
 from agents.recipe_lookup_agent import lookup as recipe_lookup_agent
+from chains.custom_chains import CustomChains
 
 # import os
 
-from output_parsers import RecipeNameData
+from output_parsers import RecipeNameData, RecipesNameData
 
 
 class Cooking:
@@ -37,7 +38,14 @@ class Cooking:
         ethnicity = input("Enter ethnicity/cuisine: ")
 
         # Gives a list of names of 5 recipes/dishes
-        return recipe_lookup_agent(ingredients, ethnicity, self.model)
+        recipe_response = recipe_lookup_agent(ingredients, ethnicity, self.model)
+
+        dishes_chain = CustomChains(self.model).get_dish_chain()
+        parsed_response: RecipesNameData = dishes_chain.invoke(
+            input={"recipe_list_data": recipe_response}
+        )
+
+        return parsed_response
 
 
 if __name__ == "__main__":
