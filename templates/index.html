@@ -35,19 +35,14 @@
                 form.style.display = "none";
 
                 const formData = new FormData(form);
-                console.log(formData.get("ingredients"));
-                console.log(formData.get("ethnicity"));
                 fetch("/process", {method: "POST", body: formData})
                     .then(response => {
                         if (response.ok) {
-                            console.log(response);
                             return response.json();
                         }
                         throw new Error("POST request failed");
                     })
                     .then(data => {
-                    console.log(data);
-                    console.log(data.length);
                     data.forEach((obj,index)=>{
                           const node=document.createElement("div");
 
