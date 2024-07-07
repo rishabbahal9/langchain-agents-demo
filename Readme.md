@@ -6,7 +6,7 @@
 2. Create .env file with the help of .env.example
 3. Run the following commands (Make sure Docker is installed & running)
 ```bash
-docker build --tag langcain-demo . 
+docker build --tag langchain-demo . 
 ``` 
 
 ```bash
