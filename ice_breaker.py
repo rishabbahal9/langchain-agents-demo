@@ -16,9 +16,8 @@ class Cooking:
     def check():
         print("Hello, Langchain!")
 
-    def recipe_generator(self):
+    def recipe_generator(self, ingredients: str):
         """A simple LLM call"""
-        ingredients = input("Enter ingredients: ")
         template = PromptTemplate(
             template="""Give me a list of 5 recipes that I can make using {ingredient}.""",
             input_variables=["ingredient"],
@@ -31,11 +30,8 @@ class Cooking:
 
         return chain.invoke(input={"ingredient": ingredients})
 
-    def recipe_generator_agent(self):
+    def recipe_creator(self, ingredients: str, ethnicity: str):
         """Generating recipes using an agent with web tool"""
-        ingredients = input("Enter ingredients: ")
-        ethnicity = input("Enter ethnicity/cuisine: ")
-
         # Gives a list of names of 3 recipes/dishes
         recipe_response = recipe_lookup_agent(ingredients, ethnicity, self.model)
 
@@ -77,9 +73,12 @@ if __name__ == "__main__":
     ice_breaker = Cooking("gpt-4o")
 
     # Calling recipe generator, simple LLM call
-    # response = ice_breaker.recipe_generator()
+    # ingredients = input("Enter ingredients: ")
+    # response = ice_breaker.recipe_generator(ingredients)
     # print(response)
 
     # Calling recipe generator agent
-    response = ice_breaker.recipe_generator_agent()
+    ingredients = input("Enter ingredients: ")
+    ethnicity = input("Enter ethnicity/cuisine: ")
+    response = ice_breaker.recipe_creator(ingredients, ethnicity)
     print(response)
