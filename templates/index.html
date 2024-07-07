@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Recipe generator</h1>
+    <form id="food-form">
+      <input type="text" id="ingredients" name="ingredients" placeholder="ingredients" />
+      <input type="text" id="ethnicity" name="ethnicity" placeholder="cuisine" />
+      <button type="submit">Submit</button>
+    </form>
+    <div id="spinner">Talking to AI...</div>
+    <div id="error_box" style="color: red;">Error occurred: Try again!</div>
+    <div id="result"></div>
+    <script>
+            const form = document.getElementById("food-form");
+            const result_element = document.getElementById("result");
+            const spinner_element = document.getElementById("spinner");
+            const error_element = document.getElementById("error_box");
+
+            result_element.style.display = "none";
+            spinner_element.style.display = "none";
+            error_element.style.display = "none";
+            form.style.display = "block";
+
+            result_element.replaceChildren();
+
+            form.addEventListener("submit", (ev) => {
+                ev.preventDefault();
+
+                result_element.style.display = "none";
+                spinner_element.style.display = "block";
+                error_element.style.display = "none";
+                form.style.display = "none";
+
+                const formData = new FormData(form);
+                console.log(formData.get("ingredients"));
+                console.log(formData.get("ethnicity"));
+                fetch("/process", {method: "POST", body: formData})
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(response);
+                            return response.json();
+                        }
+                        throw new Error("POST request failed");
+                    })
+                    .then(data => {
+                    console.log(data);
+                    console.log(data.length);
+                    data.forEach((obj,index)=>{
+                          const node=document.createElement("div");
+
+                          const child_node_1=document.createElement("h2");
+                          child_node_1.textContent=obj.name;
+                          node.appendChild(child_node_1);
+
+                          const child_node_2=document.createElement("p");
+                          child_node_2.textContent=obj.description;
+                          node.appendChild(child_node_2);
+
+                          const child_node_3=document.createElement("h4");
+                          child_node_3.textContent="Ingredients";
+                          node.appendChild(child_node_3);
+
+                          obj.ingredients.forEach(ingredient=>{
+                            const child_node_4=document.createElement("li");
+                            child_node_4.textContent=ingredient;
+                            node.appendChild(child_node_4);
+                          })
+
+                          const child_node_5=document.createElement("h4");
+                          child_node_5.textContent="Instructions";
+                          node.appendChild(child_node_5);
+
+                          obj.instructions.forEach(instruction=>{
+                            const child_node_4=document.createElement("li");
+                            child_node_4.textContent=instruction;
+                            node.appendChild(child_node_4);
+                          })
+
+                          result_element.appendChild(node)
+                        })
+                        result_element.style.display = "block";
+                        spinner_element.style.display = "none";
+                        error_element.style.display = "none";
+                        form.style.display = "block";
+
+                    })
+                    .catch(error => {
+                        console.error("Error occurred while processing the request.");
+                        console.error(error);
+                        result_element.style.display = "none";
+                        spinner_element.style.display = "none";
+                        error_element.style.display = "block";
+                        form.style.display = "block";
+                    });
+
+
+            });
+    </script>
+</body>
+</html>
